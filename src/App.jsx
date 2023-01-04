@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { getAreaData } from './api'
 
 import './App.css'
+import { AreaCard } from './AreaCard';
 
 function App() {
 
   const [areas, setAreas] = useState([]);
   const [input, setInput] = useState('');
   const [outcode, setOutcode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const load = async () => {
     try {
@@ -17,6 +19,8 @@ function App() {
     } catch (error) {
       window.alert("todo: fix app")
     }
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -24,7 +28,8 @@ function App() {
       setAreas([]);
       return;
     }
-    
+
+    setIsLoading(true);
     load();
   }, [outcode]);
 
@@ -37,13 +42,18 @@ function App() {
   return (
     <div className="App">
       <h1>Postcoders</h1>
-      <form>
+      <form className='App__form'>
         <p>Type in a UK postcode to see data for the localities it contains.<br/>
         You only need the outcode &#40;the first part&#41;, eg M5 or NW10.</p>
         <input onChange={(event) => setInput(event.target.value)}/>
         <button onClick={handleSubmit}>Go!</button>
       </form>
       <h2>{`Areas for " ${outcode} ": ${areas.length}`}</h2>
+      {
+        isLoading ? <p>Loading...</p> : 
+        areas.map((area) => <AreaCard key={area["place name"]} area={area} />)
+      }
+      
     </div>
   )
 }
