@@ -12,9 +12,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const load = async () => {
+    const cachedAreas = sessionStorage.getItem(outcode);
+
+    if(cachedAreas){
+      setAreas(JSON.parse(cachedAreas));
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const areaData = await getAreaData(outcode)
-  
+      
+      sessionStorage.setItem(outcode, JSON.stringify(areaData));
       setAreas(areaData);
     } catch (error) {
       window.alert("todo: fix app")
@@ -51,7 +60,7 @@ function App() {
       <h2>{`Areas for " ${outcode} ": ${areas.length}`}</h2>
       {
         isLoading ? <p>Loading...</p> : 
-        areas.map((area) => <AreaCard key={area["place name"]} area={area} />)
+        areas.map((area, index) => <AreaCard key={index} area={area} />)
       }
       
     </div>
